@@ -89,6 +89,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG USERNAME="developer"
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
+ARG WORKSPACE_FOLDER_NAME=/workspaces/serena
 
 RUN groupadd --gid $USER_GID $USERNAME
 RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
@@ -114,5 +115,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/instal
 
 # Install uv for developer user
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+RUN echo "if [ -f \"${WORKSPACE_FOLDER_NAME}/.venv/bin/activate\" ]; then source \"${WORKSPACE_FOLDER_NAME}/.venv/bin/activate\"; fi" >> /home/$USERNAME/.bashrc
 
 CMD ["/bin/bash"]
