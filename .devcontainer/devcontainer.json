@@ -1,16 +1,32 @@
 {
   "name": "serena Project",
-  "dockerFile": "../Dockerfile",
-  "workspaceFolder": "/workspaces/serena",
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash",
-    "python.pythonPath": "/usr/local/bin/python",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "target": "devcontainer"
   },
-  "extensions": [
-    "ms-python.python",
-    "ms-toolsai.jupyter",
-    "ms-python.vscode-pylance"
-  ],
-  "forwardPorts": [],
-  "remoteUser": "root",
+  "postCreateCommand": "bash .devcontainer/post-container-creation.sh",
+  "workspaceFolder": "/workspaces/serena",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "python.pythonPath": "/usr/local/bin/python",
+        // Formatting
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true
+        // "python.formatting.provider": "black",
+        // "python.linting.pylintEnabled": true,
+        // "python.linting.enabled": true
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-python.vscode-pylance",
+        "ms-azuretools.vscode-containers"
+      ]
+    }
+  },
+  "forwardPorts": []
 }

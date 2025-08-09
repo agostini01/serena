@@ -2,6 +2,9 @@
 FROM python:3.11-slim AS base
 SHELL ["/bin/bash", "-c"]
 
+# Set environment variables to avoid interactive prompts during package installation.
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Set environment variables to make Python print directly to the terminal and avoid .pyc files.
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -40,6 +43,10 @@ WORKDIR /workspaces/serena
 
 # Development target
 FROM base AS development
+
+# Set environment variables to avoid interactive prompts during package installation.
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Copy all files for development
 COPY . /workspaces/serena/
 
@@ -54,6 +61,10 @@ ENTRYPOINT ["/bin/bash", "-c", "source .venv/bin/activate && $0 $@"]
 
 # Production target
 FROM base AS production
+
+# Set environment variables to avoid interactive prompts during package installation.
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Copy only necessary files for production
 COPY pyproject.toml /workspaces/serena/
 COPY README.md /workspaces/serena/
@@ -68,3 +79,40 @@ ENV PATH="/workspaces/serena/.venv/bin:${PATH}"
 # Entrypoint to ensure environment is activated
 ENTRYPOINT ["/bin/bash", "-c", "source .venv/bin/activate && $0 $@"]
 
+# VSCode Devcontainer target
+FROM base AS devcontainer
+
+# Set environment variables to avoid interactive prompts during package installation.
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Add non-root user to the image.
+ARG USERNAME="developer"
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME
+RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+RUN apt-get update && apt-get install -y --no-install-recommends sudo \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
+RUN chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Switch to developer user
+USER $USERNAME
+
+# Set environment variables for nvm and node for developer user
+ENV NVM_VERSION=0.40.3
+ENV NODE_VERSION=22.18.0
+ENV NVM_DIR="/home/$USERNAME/.nvm"
+ENV PATH="$NVM_DIR/versions/node/v${NODE_VERSION}/bin/:$PATH:/home/$USERNAME/.local/bin"
+
+# Install nvm and node for developer user
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash \
+    && . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} \
+    && . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION} \
+    && . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+
+# Install uv for developer user
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+SHELL ["/bin/bash", "-c"]
