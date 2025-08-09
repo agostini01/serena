@@ -98,6 +98,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends sudo \
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
 RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
+# Install development tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    less vim \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Switch to developer user
 USER $USERNAME
 
