@@ -115,4 +115,4 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/instal
 # Install uv for developer user
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-SHELL ["/bin/bash", "-c"]
+CMD ["/bin/bash"]
