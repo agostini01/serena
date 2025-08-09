@@ -9,6 +9,17 @@
   "customizations": {
     "vscode": {
       "settings": {
+        // Ensure new terminals use bash by default
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash",
+            "args": [
+              "-l"
+            ]
+          }
+        },
+        // Legacy setting for older VS Code versions
         "terminal.integrated.shell.linux": "/bin/bash",
         "python.pythonPath": "/usr/local/bin/python",
         // Formatting
